@@ -14,6 +14,8 @@ let $closeTodoBtn; // przyisk zamyakania popup'a
 
 let $idNumber = 0; //zmienna globalna przechowująca id zadania
 
+let $allTasks; //zmienna przechwytująca wszystkie zapisane zadania
+
 const main = () => {
     prepareDOMElements();
     prepareDOMEvents();
@@ -32,6 +34,9 @@ const prepareDOMElements = () => {
     $popupInput = document.querySelector('.popupInput')
     $addPopupBtn = document.querySelector('.accept')
     $closeTodoBtn = document.querySelector('.cancel')
+    
+    $allTasks = $ulList.getElementsByTagName('li'); //pobieranie wszystkich zadań (html collection)
+
 };
 
 
@@ -42,6 +47,7 @@ const prepareDOMEvents = () => {
     $ulList.addEventListener('click' , checkClick); //nasłuchiwanie na click -> funkcja checkClick
     $closeTodoBtn.addEventListener('click' , closePopup); //Zamknięcie popup'a przy edycji zadania
     $addPopupBtn.addEventListener('click' , changeTodo); //zatwierdzenie zmian w popup'ie
+    $todoInput.addEventListener('keyup' , enterCheck) //nasłuchiwanie na enter
 
 };
 
@@ -59,6 +65,13 @@ const addNewTask = () => {
         createToolsArea(); //Wywołanie funkcji odpowiadającej za dodanie elementów modyfikujących zadanie
     }else {
         $alertInfo.innerText = 'Wpisz poprawnie treść zadania!' //zabezpieczenie przed dodaniem pustego zadania
+    }
+}
+
+//dodanie zadania za pomocą przycisku ENTER
+const enterCheck = () => {
+    if(event.keyCode === 13 ){  //13 - id entera
+        addNewTask()
     }
 }
 
@@ -96,9 +109,10 @@ const checkClick = (event) => {
     }else if (event.target.closest('button').className === 'edit') {
         editTask(event);
     }else if (event.target.closest('button').className === 'delete'){
-
+        deleteTask(event)
     }
 }
+
 //edycja zadania
 const editTask = (event) => {
     const oldTodo = event.target.closest('li').id; //pobranie id z edytowanego elementu
@@ -122,6 +136,18 @@ const changeTodo = () => {
 
 const closePopup = () => {
     $popup.style.display = 'none'; //zamknięcie popup'a
+    $popupInfo.innerText = ''; //wyzerowanie treści
+}
+
+
+//usuwanie zadań
+const deleteTask = (event) => {
+    const deleteTodo = event.target.closest('li');
+    deleteTodo.remove();
+
+    if($allTasks.length === 0){
+        $alertInfo.innerText = 'Brak zadań na liście!'; //Wyświetlenie informacji o braku zadań
+    }
 }
 
 
