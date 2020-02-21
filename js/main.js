@@ -12,6 +12,8 @@ let $popupInput; // tekst wrzucany w inputa w popup'ie
 let $addPopupBtn; // Przycisk zatwierdzenia w popup'ie
 let $closeTodoBtn; // przyisk zamyakania popup'a 
 
+let $idNumber = 0; //zmienna globalna przechowująca id zadania
+
 const main = () => {
     prepareDOMElements();
     prepareDOMEvents();
@@ -39,6 +41,7 @@ const prepareDOMEvents = () => {
     $addBtn.addEventListener('click' , addNewTask); //nasłuchwanie na dodanie nowego zadania
     $ulList.addEventListener('click' , checkClick); //nasłuchiwanie na click -> funkcja checkClick
     $closeTodoBtn.addEventListener('click' , closePopup); //Zamknięcie popup'a przy edycji zadania
+    $addPopupBtn.addEventListener('click' , changeTodo); //zatwierdzenie zmian w popup'ie
 
 };
 
@@ -46,8 +49,10 @@ const prepareDOMEvents = () => {
 //dodawanie nowego zadania
 const addNewTask = () => {
     if ($todoInput.value !== ''){
+        $idNumber++; //dopisanie id do każdego nowego zadania
         $newTask = document.createElement('li') //stworzenie nowego elementu listy
         $newTask.innerText = $todoInput.value; //przechwycenie wartośći z inputa
+        $newTask.setAttribute('id' , `todo-${$idNumber}`) //dodanie id do zadania
         $ulList.appendChild($newTask) //Dodanie nowego elementu do listy
         $todoInput.value = ''; //wyzerowanie inputa
         $alertInfo.innerText = 'Dodano nowe zadanie!'
@@ -89,17 +94,34 @@ const checkClick = (event) => {
         event.target.closest('button').classList.toggle('completed') //wyszarzenie przycisku "wykonane"
 
     }else if (event.target.closest('button').className === 'edit') {
-        editTask();
+        editTask(event);
     }else if (event.target.closest('button').className === 'delete'){
 
     }
 }
+//edycja zadania
+const editTask = (event) => {
+    const oldTodo = event.target.closest('li').id; //pobranie id z edytowanego elementu
+    $editedTodo = document.getElementById(oldTodo)
+    $popupInput.value = $editedTodo.firstChild.textContent; // Treśc wpisana w popup'ie zapisane do $editedTodo
 
-const editTask = () => {
-    $popup.style.display = 'flex';
+    $popup.style.display = 'flex'; //aktywny popup
 }
+
+const changeTodo = () => {
+    if($popupInput.value !== ''){
+        $editedTodo.firstChild.textContent = $popupInput.value;
+        $popup.style.display = 'none'; // wyłączenie popup'a po zatwierdzeniu zmian
+        $popupInfo.innerText = ''; //wyczyszczenie popupInfo po zatwierdzeniu zmian
+    }else{
+        $popupInfo.innerText = 'Podaj poprawną treść!'
+    }
+}
+
+
+
 const closePopup = () => {
-    $popup.style.display = 'none';
+    $popup.style.display = 'none'; //zamknięcie popup'a
 }
 
 
